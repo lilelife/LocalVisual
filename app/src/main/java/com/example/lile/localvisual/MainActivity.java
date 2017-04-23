@@ -176,7 +176,7 @@ public class MainActivity extends Activity {
 
     /**
      * 位置提醒监听器
-     * @author ys
+     * @author dell
      *
      */
     class MyNotifyListener extends BDNotifyListener {
