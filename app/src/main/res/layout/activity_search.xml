@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_marginBottom="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btn_return"
+            android:layout_width="25dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/re_left"
+            />
+        <EditText
+            android:id="@+id/edt_search"
+            android:layout_width="280dp"
+            android:layout_height="40dp"
+            android:background="@drawable/edittext1"
+            android:layout_marginLeft="40dp"
+            />
+        <Button
+            android:id="@+id/btn_deleteText"
+            android:layout_marginLeft="292dp"
+            android:layout_width="25dp"
+            android:layout_height="39dp"
+            android:background="@drawable/delete"
+            android:visibility="gone"
+            />
+        <Button
+            android:id="@+id/btn_search_action"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="11dp"
+            android:background="@drawable/blue_sear"
+
+            android:layout_alignBottom="@+id/btn_return"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="11dp" />
+    </RelativeLayout>
+    <FrameLayout
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/lst_history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </ListView>
+        <RelativeLayout
+            android:id="@+id/empty_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="36px"
+                android:layout_marginLeft="30dp"
+                android:text="@string/str_nohistory"
+                android:id="@+id/textView" />
+            <Button
+                android:background="@drawable/refresh"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/textView"
+                android:layout_toEndOf="@+id/textView"
+                android:layout_marginLeft="60dp"
+                android:layout_marginStart="60dp"
+                android:id="@+id/button" />
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textSize="30px"
+                android:text="@string/str_refresh"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/button"
+                android:layout_toEndOf="@+id/button" />
+        </RelativeLayout>
+    </FrameLayout>
+
+</LinearLayout>
