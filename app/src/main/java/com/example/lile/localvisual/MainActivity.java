@@ -136,7 +136,7 @@ public class MainActivity extends Activity {
         btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this,SearchActivity1.class);
+                Intent intent=new Intent(MainActivity.this,SearchActivity.class);
                 intent.putExtra("CITY",city);
                 startActivity(intent);
             }
@@ -158,7 +158,7 @@ public class MainActivity extends Activity {
             locType = location.getLocType();
             longitude = location.getLongitude();
             latitude = location.getLatitude();
-            Toast.makeText(MainActivity.this, "当前定位的返回值是："+locType+" "+longitude+" "+latitude, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this, "当前定位的返回值是："+locType+" "+longitude+" "+latitude, Toast.LENGTH_SHORT).show();
             if (location.hasRadius()) {// 判断是否有定位精度半径
                 radius = location.getRadius();
             }
@@ -170,8 +170,8 @@ public class MainActivity extends Activity {
                         Toast.LENGTH_SHORT).show();
             } else if (locType == BDLocation.TypeNetWorkLocation) {
                 addrStr = location.getAddrStr();// 获取反地理编码(文字描述的地址)
-                Toast.makeText(MainActivity.this, addrStr,
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, addrStr,
+//                        Toast.LENGTH_SHORT).show();
             }
             direction = location.getDirection();// 获取手机方向，【0~360°】,手机上面正面朝北为0°
             province = location.getProvince();// 省份

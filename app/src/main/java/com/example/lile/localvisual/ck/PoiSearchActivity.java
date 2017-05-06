@@ -123,7 +123,7 @@ public class PoiSearchActivity extends Activity implements OnClickListener {
 		
 		suggestionSearch = SuggestionSearch.newInstance();
 		
-		suggestionSearch.requestSuggestion(new SuggestionSearchOption().keyword("百度").city("背景"));
+		suggestionSearch.requestSuggestion(new SuggestionSearchOption().keyword("百度").city("西安"));
 		//发出请求
 		/**
 		 *   poi点的位置+名称+

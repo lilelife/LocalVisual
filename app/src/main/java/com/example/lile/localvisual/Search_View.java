@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,8 @@ import com.example.lile.localvisual.R;
 import com.example.lile.localvisual.RecordSQLiteOpenHelper;
 import com.example.lile.localvisual.Search_Listview;
 
+import java.util.Date;
+
 /**
  * Created by dell on 17/04/23.
  */
@@ -37,6 +40,7 @@ public class Search_View extends LinearLayout {
     private EditText et_search;
     private TextView tv_tip;
     private ImageView iv_search;
+    private ImageView iv_back;
     private Button btn_deletetd;
     /*列表及其适配器*/
     private Search_Listview listView;
@@ -74,7 +78,6 @@ public class Search_View extends LinearLayout {
         //初始化UI组件
         initView();
 
-
         //实例化数据库SQLiteOpenHelper子类对象
         helper = new RecordSQLiteOpenHelper(context);
 
@@ -96,17 +99,21 @@ public class Search_View extends LinearLayout {
         et_search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                Log.i("输入框","开始");
 
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 btn_deletetd.setVisibility(View.VISIBLE);
+                Log.i("输入框","进行");
+
             }
 
             //输入后调用该方法
             @Override
             public void afterTextChanged(Editable s) {
+                Log.i("输入框","keyon");
 
                 if (s.toString().trim().length() == 0) {
                     //若搜索框为空,则模糊搜索空字符,即显示所有的搜索历史
@@ -114,7 +121,7 @@ public class Search_View extends LinearLayout {
                 } else {
                     tv_tip.setText("搜索结果");
                 }
-
+                Log.i("输入框","keyon");
                 //每次输入后都查询数据库并显示
                 //根据输入的值去模糊查询数据库中有没有数据
                 String tempName = et_search.getText().toString();
@@ -133,7 +140,6 @@ public class Search_View extends LinearLayout {
         // 点击回调
         et_search.setOnKeyListener(new OnKeyListener() {// 输入完后按键盘上的搜索键
 
-
             // 修改回车键功能
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -143,6 +149,7 @@ public class Search_View extends LinearLayout {
 
                     // 按完搜索键后将当前查询的关键字保存起来,如果该关键字已经存在就不执行保存
                     boolean hasData = hasData(et_search.getText().toString().trim());
+
                     if (!hasData) {
                         insertData(et_search.getText().toString().trim());
 
@@ -173,7 +180,7 @@ public class Search_View extends LinearLayout {
             }
         });
 
-//        // 插入数据，便于测试，否则第一次进入没有数据怎么测试呀？
+////        // 插入数据，便于测试，否则第一次进入没有数据怎么测试呀？
 //        Date date = new Date();
 //        long time = date.getTime();
 //        insertData("Leo" + time);
@@ -196,10 +203,12 @@ public class Search_View extends LinearLayout {
                 context.startActivity(intent);
             }
         });
+//
+    }
 
-
-
-
+    //定义方法设置按钮
+    public void setOnclik(OnClickListener lister){
+        iv_back.setOnClickListener(lister);
     }
 
     /**
@@ -209,12 +218,13 @@ public class Search_View extends LinearLayout {
     /*初始化组件*/
     private void initView(){
         LayoutInflater.from(context).inflate(R.layout.search_layout,this);
-        btn_deletetd=(Button)findViewById(R.id.btn_deleteText);
+        btn_deletetd=(Button)findViewById(R.id.btn_deletetext);
         et_search = (EditText) findViewById(R.id.et_search);
         tv_clear = (TextView) findViewById(R.id.tv_clear);
         tv_tip = (TextView) findViewById(R.id.tv_tip);
         listView = (Search_Listview) findViewById(R.id.listView);
         iv_search = (ImageView) findViewById(R.id.iv_search);
+        iv_back = (ImageView) findViewById(R.id.iv_back);
     }
 
     /*插入数据*/
@@ -227,6 +237,7 @@ public class Search_View extends LinearLayout {
     /*模糊查询数据 并显示在ListView列表上*/
     private void queryData(String tempName) {
 
+        Log.i("搜索","实现--->"+tempName);
         //模糊搜索
         Cursor cursor = helper.getReadableDatabase().rawQuery(
                 "select id as _id,name from records where name like '%" + tempName + "%' order by id desc ", null);

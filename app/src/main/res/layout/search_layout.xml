@@ -8,10 +8,12 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="50dp"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal"
         android:paddingRight="16dp">
 
         <ImageView
+            android:id="@+id/iv_back"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_gravity="center_vertical"
@@ -32,11 +34,11 @@
                android:hint="输入查询的关键字"
                android:imeOptions="actionSearch"
                android:singleLine="true"
-               android:textColor="@android:color/white"
+               android:textColor="@android:color/black"
                android:textSize="16sp" />
 
            <Button
-               android:id="@+id/:btn_deleteText"
+               android:id="@+id/btn_deletetext"
                android:layout_width="40dp"
                android:layout_height="40dp"
                android:visibility="gone"
