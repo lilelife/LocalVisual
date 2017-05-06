@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.example.lile.localvisual.view.BusLineSearchActivity;
 
 /**
  * Created by lile on 2017/4/23.
@@ -25,9 +24,10 @@ public class SearchActivity1 extends Activity {
     private EditText edt_search;
     private ListView listView;
     private View empty_view;
-
+    private Intent intent;
+    private String city;
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
@@ -44,8 +44,8 @@ public class SearchActivity1 extends Activity {
                 case R.id.btn_return:
                     finish();//返回上一层打的Mainactivity
                     break;
-                case R.id.btn_search:
-                    Intent intent=new Intent(SearchActivity1.this, BusLineSearchActivity.class);
+                case R.id.btn_search_action:
+                    Intent intent=new Intent(SearchActivity1.this, SearchResultActivity.class);
                     intent.putExtra("searchInfo",edt_search.getText().toString().trim());
                     startActivity(intent);
                     break;
@@ -53,8 +53,10 @@ public class SearchActivity1 extends Activity {
         }
     };
     void init(){
-        listView=(ListView)findViewById(R.id.lst_history);
-        empty_view=(View)findViewById(R.id.empty_list);
+        intent = getIntent();
+        city = intent.getStringExtra("CITY");
+        listView = (ListView)findViewById(R.id.lst_history);
+        empty_view = (View)findViewById(R.id.empty_list);
         listView.setEmptyView(empty_view);//当用户没有地点搜索信息时候，设置一个空的empty view
 
         //TODO listview初始化

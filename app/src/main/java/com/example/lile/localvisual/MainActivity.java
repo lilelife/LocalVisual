@@ -2,6 +2,7 @@ package com.example.lile.localvisual;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.KeyEvent;
@@ -17,13 +18,13 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
-import com.example.lile.localvisual.view.LocationActivity;
 
 public class MainActivity extends Activity {
     private MapView mapView;
@@ -61,8 +62,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
-        mapView = (MapView) findViewById(R.id.baidumap);
-
+       // mapView = (MapView) findViewById(R.id.baidumap);
+        init();
     }
     View.OnClickListener listener=new View.OnClickListener() {
         @Override
@@ -90,12 +91,22 @@ public class MainActivity extends Activity {
         }
     };
     void init() {
-        mapView = (MapView) findViewById(R.id.bd_mapview);
+        //百度地图
+        mapView = (MapView) findViewById(R.id.baidumap);
         bdMap = mapView.getMap();
-        locateBtn = (Button) findViewById(R.id.locate_btn);
+        bdMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
+        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory
+                .fromResource(R.drawable.icon_marka);
+//        currentMarker= bitmapDescriptor;
+//
+//        bdMap.setMyLocationConfigeration(new MyLocationConfiguration(
+//                MyLocationConfiguration.LocationMode.NORMAL, true, bitmapDescriptor));
+        locateBtn = (Button) findViewById(R.id.btn_location);
         locateBtn.setOnClickListener(listener);
         currentMode = MyLocationConfiguration.LocationMode.COMPASS;
-        locateBtn.setText("罗盘");
+        bdMap.setMyLocationConfigeration(new MyLocationConfiguration(
+                currentMode, true, currentMarker));
+//        locateBtn.setText("罗盘");
         mVibrator =(Vibrator)getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE );
         bdMap.setMyLocationEnabled(true);
         // 1. 初始化LocationClient类
@@ -120,13 +131,24 @@ public class MainActivity extends Activity {
         // 6. 开启/关闭 定位SDK
         locationClient.start();
 
+        //搜索按钮
+        btn_search=(Button)findViewById(R.id.btn_search);
+        btn_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,SearchActivity1.class);
+                intent.putExtra("CITY",city);
+                startActivity(intent);
+            }
+        });
+
+
         }
     class MyLocationListener implements BDLocationListener {
         @Override
         public void onConnectHotSpotMessage(String s, int i) {
 
         }
-
         // 异步返回的定位结果
         @Override
         public void onReceiveLocation(BDLocation location) {

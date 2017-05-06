@@ -2,4 +2,5 @@
     <string name="app_name">LocalVisual</string>
     <string name="str_nohistory">您还没有任何搜索记录</string>
     <string name="str_refresh">点击刷新</string>
+    <string name="str_search">搜索地理位置等</string>
 </resources>

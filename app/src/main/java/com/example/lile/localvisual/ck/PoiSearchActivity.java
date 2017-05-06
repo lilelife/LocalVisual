@@ -1,4 +1,4 @@
-package com.example.lile.localvisual.view;
+package com.example.lile.localvisual.ck;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.MapView;
@@ -12,6 +12,7 @@ import com.baidu.mapapi.search.poi.PoiBoundSearchOption;
 import com.baidu.mapapi.search.poi.PoiCitySearchOption;
 import com.baidu.mapapi.search.poi.PoiDetailResult;
 import com.baidu.mapapi.search.poi.PoiDetailSearchOption;
+import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiNearbySearchOption;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
@@ -22,6 +23,7 @@ import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
+import com.example.lile.localvisual.R;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -150,6 +152,11 @@ public class PoiSearchActivity extends Activity implements OnClickListener {
 	 * 
 	 */
 	OnGetPoiSearchResultListener poiSearchListener = new OnGetPoiSearchResultListener() {
+
+		@Override
+		public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
+
+		}
 		// 获取poiResult
 		@Override
 		public void onGetPoiResult(PoiResult poiResult) {
@@ -206,6 +213,11 @@ public class PoiSearchActivity extends Activity implements OnClickListener {
 
 			Toast.makeText(PoiSearchActivity.this, "url分享："+arg0.toString(), Toast.LENGTH_SHORT).show();
 		}
+
+		@Override
+		public void onGetRouteShareUrlResult(ShareUrlResult shareUrlResult) {
+
+		}
 	};
 
 	class MyPoiOverlay extends PoiOverlay {
@@ -215,7 +227,7 @@ public class PoiSearchActivity extends Activity implements OnClickListener {
 		}
 
 		// 检索Poi详细信息.获取PoiOverlay
-		@Override 
+		@Override
 		public boolean onPoiClick(int arg0) {
 			super.onPoiClick(arg0);
 			PoiInfo poiInfo = getPoiResult().getAllPoi().get(arg0);

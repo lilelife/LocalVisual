@@ -23,13 +23,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SearchActivity"
+        <activity android:name=".SearchActivity1"
             android:label="搜索目的地填写"
-            android:theme="@android:style/Theme.NoTitleBar"
-            />
+            android:theme="@android:style/Theme.Light.NoTitleBar">
+        </activity>
+
         <activity android:name=".SearchResultActivity"
             android:label="显示搜索结果的界面"
-            android:theme="@android:style/Theme.NoTitleBar"
+            android:theme="@android:style/Theme.Light.NoTitleBar"
             />
     </application>
     <!-- 百度API所需权限 -->

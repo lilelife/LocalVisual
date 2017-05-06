@@ -1,4 +1,4 @@
-package com.example.lile.localvisual.view;
+package com.example.lile.localvisual.ck;
 
 import com.baidu.mapapi.SDKInitializer;
 

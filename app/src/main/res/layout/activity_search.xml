@@ -3,7 +3,8 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <RelativeLayout
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
@@ -24,7 +25,7 @@
             android:id="@+id/btn_deleteText"
             android:layout_marginLeft="292dp"
             android:layout_width="25dp"
-            android:layout_height="39dp"
+            android:layout_height="35dp"
             android:background="@drawable/delete"
             android:visibility="gone"
             />
