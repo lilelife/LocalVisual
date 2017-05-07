@@ -18,8 +18,8 @@ public class SearchActivity extends Activity {
         setContentView(R.layout.myview);
 //        Search_View view=new Search_View(getApplicationContext());
         Search_View view=(Search_View) findViewById(R.id.search_layout);
-        Log.i("搜索act","begin");
-        view.setOnClickListener(new View.OnClickListener() {
+        Log.i("搜索activity","begin");
+        view.setOnclik(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

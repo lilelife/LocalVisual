@@ -113,7 +113,7 @@ public class Search_View extends LinearLayout {
             //输入后调用该方法
             @Override
             public void afterTextChanged(Editable s) {
-                Log.i("输入框","keyon");
+                Log.i("输入框","完成");
 
                 if (s.toString().trim().length() == 0) {
                     //若搜索框为空,则模糊搜索空字符,即显示所有的搜索历史
@@ -121,7 +121,7 @@ public class Search_View extends LinearLayout {
                 } else {
                     tv_tip.setText("搜索结果");
                 }
-                Log.i("输入框","keyon");
+                Log.i("输入框",et_search.getText().toString());
                 //每次输入后都查询数据库并显示
                 //根据输入的值去模糊查询数据库中有没有数据
                 String tempName = et_search.getText().toString();
@@ -138,30 +138,29 @@ public class Search_View extends LinearLayout {
 
         // 搜索框的键盘搜索键
         // 点击回调
-        et_search.setOnKeyListener(new OnKeyListener() {// 输入完后按键盘上的搜索键
-
-            // 修改回车键功能
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    // 隐藏键盘，这里getCurrentFocus()需要传入Activity对象，如果实际不需要的话就不用隐藏键盘了，免得传入Activity对象，这里就先不实现了
-//                    ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
-//                            getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-                    // 按完搜索键后将当前查询的关键字保存起来,如果该关键字已经存在就不执行保存
-                    boolean hasData = hasData(et_search.getText().toString().trim());
-
-                    if (!hasData) {
-                        insertData(et_search.getText().toString().trim());
-
-                        queryData("");
-                    }
-                    Intent intent=new Intent(getContext(),SearchResultActivity.class);
-                    intent.putExtra("searchInfo",et_search.getText().toString().trim());
-                    context.startActivity(intent);
-                }
-                return false;
-            }
-        });
+//        et_search.setOnKeyListener(new OnKeyListener() {// 输入完后按键盘上的搜索键
+//            // 修改回车键功能
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+//                    // 隐藏键盘，这里getCurrentFocus()需要传入Activity对象，如果实际不需要的话就不用隐藏键盘了，免得传入Activity对象，这里就先不实现了
+////                    ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
+////                            getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+//
+//                    // 按完搜索键后将当前查询的关键字保存起来,如果该关键字已经存在就不执行保存
+//                    boolean hasData = hasData(et_search.getText().toString().trim());
+//
+//                    if (!hasData) {
+//                        insertData(et_search.getText().toString().trim());
+//
+//                        queryData("");
+//                    }
+//                    Intent intent=new Intent(getContext(),SearchResultActivity.class);
+//                    intent.putExtra("searchInfo",et_search.getText().toString().trim());
+//                    context.startActivity(intent);
+//                }
+//                return false;
+//            }
+//        });
 
 
 
@@ -189,6 +188,7 @@ public class Search_View extends LinearLayout {
         iv_search.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("点击搜索按钮","sousuo");
                 boolean hasData = hasData(et_search.getText().toString().trim());
                 if (!hasData) {
                     insertData(et_search.getText().toString().trim());

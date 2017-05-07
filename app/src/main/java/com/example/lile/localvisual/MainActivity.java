@@ -95,27 +95,16 @@ public class MainActivity extends Activity {
         mapView = (MapView) findViewById(R.id.baidumap);
         bdMap = mapView.getMap();
         bdMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
-        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory
-                .fromResource(R.drawable.icon_marka);
-//        currentMarker= bitmapDescriptor;
-//
-//        bdMap.setMyLocationConfigeration(new MyLocationConfiguration(
-//                MyLocationConfiguration.LocationMode.NORMAL, true, bitmapDescriptor));
         locateBtn = (Button) findViewById(R.id.btn_location);
         locateBtn.setOnClickListener(listener);
         currentMode = MyLocationConfiguration.LocationMode.COMPASS;
         bdMap.setMyLocationConfigeration(new MyLocationConfiguration(
                 currentMode, true, currentMarker));
-//        locateBtn.setText("罗盘");
         mVibrator =(Vibrator)getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE );
         bdMap.setMyLocationEnabled(true);
-        // 1. 初始化LocationClient类
         locationClient = new LocationClient(getApplicationContext());
-        // 2. 声明LocationListener类
         locationListener = new MainActivity.MyLocationListener();
-        // 3. 注册监听函数
         locationClient.registerLocationListener(locationListener);
-        // 4. 设置参数
         LocationClientOption locOption = new LocationClientOption();
         locOption.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);// 设置定位模式
         locOption.setCoorType("bd09ll");// 设置定位结果类型
@@ -124,11 +113,9 @@ public class MainActivity extends Activity {
         locOption.setNeedDeviceDirect(true);// 设置返回结果包含手机的方向
 
         locationClient.setLocOption(locOption);
-        // 5. 注册位置提醒监听事件
         notifyListener = new MainActivity.MyNotifyListener();
         notifyListener.SetNotifyLocation(longitude, latitude, 3000, "bd09ll");//精度，维度，范围，坐标类型
         locationClient.registerNotify(notifyListener);
-        // 6. 开启/关闭 定位SDK
         locationClient.start();
 
         //搜索按钮
@@ -177,9 +164,9 @@ public class MainActivity extends Activity {
             province = location.getProvince();// 省份
             city = location.getCity();// 城市
             district = location.getDistrict();// 区县
-            Toast.makeText(MainActivity.this,
-                    province + "~" + city + "~" + district, Toast.LENGTH_SHORT)
-                    .show();
+//            Toast.makeText(MainActivity.this,
+//                    province + "~" + city + "~" + district, Toast.LENGTH_SHORT)
+//                    .show();
             // 构造定位数据
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(radius)//

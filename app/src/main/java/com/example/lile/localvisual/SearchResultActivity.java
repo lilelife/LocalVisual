@@ -3,11 +3,14 @@ package com.example.lile.localvisual;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,14 +23,20 @@ import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
+import com.baidu.mapapi.overlayutil.DrivingRouteOverlay;
 import com.baidu.mapapi.overlayutil.PoiOverlay;
+import com.baidu.mapapi.overlayutil.WalkingRouteOverlay;
 import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
@@ -39,13 +48,23 @@ import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiNearbySearchOption;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
+import com.baidu.mapapi.search.route.BikingRouteResult;
+import com.baidu.mapapi.search.route.DrivingRoutePlanOption;
+import com.baidu.mapapi.search.route.DrivingRouteResult;
+import com.baidu.mapapi.search.route.IndoorRouteResult;
+import com.baidu.mapapi.search.route.MassTransitRouteResult;
+import com.baidu.mapapi.search.route.OnGetRoutePlanResultListener;
+import com.baidu.mapapi.search.route.PlanNode;
+import com.baidu.mapapi.search.route.RoutePlanSearch;
+import com.baidu.mapapi.search.route.TransitRouteResult;
+import com.baidu.mapapi.search.route.WalkingRoutePlanOption;
+import com.baidu.mapapi.search.route.WalkingRouteResult;
 import com.baidu.mapapi.search.share.OnGetShareUrlResultListener;
 import com.baidu.mapapi.search.share.ShareUrlResult;
 import com.baidu.mapapi.search.share.ShareUrlSearch;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
-import com.example.lile.localvisual.ck.PoiSearchActivity;
 
 /**
  * Created by lile on 2017/4/23.
@@ -55,6 +74,7 @@ import com.example.lile.localvisual.ck.PoiSearchActivity;
 public class SearchResultActivity extends Activity {
     private Button btn_refreshresult;
     private TextView tv_resutltext;
+    private ImageView iv_back;
     private BaiduMap baiduMap;
     private MapView mapView;
     private LocationClient locationClient;
@@ -86,11 +106,12 @@ public class SearchResultActivity extends Activity {
     private ShareUrlSearch shareUrlSearch;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_searchresult);
         init();
-        citySearch();
+//        citySearch();
+//        nearbySearch();
     }
 
     void init(){
@@ -102,25 +123,80 @@ public class SearchResultActivity extends Activity {
                 //TODO 刷新搜索结果
             }
         });
-        //TODO 搜索结果
+        iv_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                baiduMap.clear();
+                BitmapDescriptor bitmap = BitmapDescriptorFactory
+                        .fromResource(R.drawable.icon_marka);
+                //构建MarkerOption，用于在地图上添加Marker
+                OverlayOptions option = new MarkerOptions()
+                        .position(latLng)
+                        .icon(bitmap);
+                baiduMap.addOverlay(option);
+            }
+            @Override
+            public boolean onMapPoiClick(MapPoi mapPoi) {
+                baiduMap.clear();
+                BitmapDescriptor bitmap = BitmapDescriptorFactory
+                        .fromResource(R.drawable.icon_marka);
+                //构建MarkerOption，用于在地图上添加Marker
+                OverlayOptions option = new MarkerOptions()
+                        .position(mapPoi.getPosition())
+                        .icon(bitmap);
+                baiduMap.addOverlay(option);
+                Log.e("TAG", "点击到地图上的POI物体了！名称：" + mapPoi.getName() + ",Uid:" + mapPoi.getUid());
+                return true;
+            }
+        });
+        poi();
+        //路径检索
 
+
+    }
+
+    void initview(){
+        //百度地图
+        mapView = (MapView) findViewById(R.id.baidu_map2);
+        baiduMap = mapView.getMap();
+        baiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
+        loc();
+
+        locateBtn = (Button) findViewById(R.id.btn_location2);
         locateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isFirstLoc=true;
             }
         });
+        btn_refreshresult = (Button)findViewById(R.id.btn_refresh);
+
+        tv_resutltext = (TextView) findViewById(R.id.tv_resulttext);
+        intent = this.getIntent();
+        str_search= intent.getStringExtra("searchInfo");
+        iv_back = (ImageView)findViewById(R.id.iv_back2);
+
+        //检索组件初始化
+        poiSearch = PoiSearch.newInstance();
+        suggestionSearch = SuggestionSearch.newInstance();
+        shareUrlSearch = ShareUrlSearch.newInstance();
+    }
+    //定位
+    void loc(){
         currentMode = MyLocationConfiguration.LocationMode.COMPASS;
         baiduMap.setMyLocationConfigeration(new MyLocationConfiguration(
                 currentMode, true, currentMarker));
+        mVibrator =(Vibrator)getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE );
         baiduMap.setMyLocationEnabled(true);
-        // 1. 初始化LocationClient类
         locationClient = new LocationClient(getApplicationContext());
-        // 2. 声明LocationListener类
         locationListener = new SearchResultActivity.MyLocationListener();
-        // 3. 注册监听函数
         locationClient.registerLocationListener(locationListener);
-        // 4. 设置参数
         LocationClientOption locOption = new LocationClientOption();
         locOption.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);// 设置定位模式
         locOption.setCoorType("bd09ll");// 设置定位结果类型
@@ -129,32 +205,266 @@ public class SearchResultActivity extends Activity {
         locOption.setNeedDeviceDirect(true);// 设置返回结果包含手机的方向
 
         locationClient.setLocOption(locOption);
-        // 5. 注册位置提醒监听事件
         notifyListener = new SearchResultActivity.MyNotifyListener();
         notifyListener.SetNotifyLocation(longitude, latitude, 3000, "bd09ll");//精度，维度，范围，坐标类型
         locationClient.registerNotify(notifyListener);
-        // 6. 开启/关闭 定位SDK
         locationClient.start();
     }
 
-    void initview(){
-        mapView = (MapView) findViewById(R.id.baidumap);
-        baiduMap = mapView.getMap();
-        baiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
-        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory
-                .fromResource(R.drawable.icon_marka);
-        locateBtn = (Button) findViewById(R.id.btn_location);
-        btn_refreshresult = (Button)findViewById(R.id.btn_refresh);
-        tv_resutltext = (TextView) findViewById(R.id.tv_resulttext);
-        intent = this.getIntent();
-        str_search= intent.getStringExtra("searchInfo");
+    //搜索
+    void  poi(){
+        //POI检索的监听对象
+        OnGetPoiSearchResultListener resultListener = new OnGetPoiSearchResultListener() {
+            //获得POI的检索结果，一般检索数据都是在这里获取
+            @Override
+            public void onGetPoiResult(PoiResult poiResult) {
+                //如果搜索到的结果不为空，并且没有错误
+                if (poiResult != null && poiResult.error == PoiResult.ERRORNO.NO_ERROR) {
+                    MyOverLay overlay = new MyOverLay(baiduMap, poiSearch);//这传入search对象，因为一般搜索到后，点击时方便发出详细搜索
+                    //设置数据,这里只需要一步，
+                    overlay.setData(poiResult);
+                    //添加到地图
+                    overlay.addToMap();
+                    //将显示视图拉倒正好可以看到所有POI兴趣点的缩放等级
+                    overlay.zoomToSpan();//计算工具
+                    //设置标记物的点击监听事件
+                    baiduMap.setOnMarkerClickListener(overlay);
+                } else {
+                    Toast.makeText(getApplication(), "搜索不到你需要的信息！", Toast.LENGTH_SHORT).show();
+                }
+            }
+            //获得POI的详细检索结果，如果发起的是详细检索，这个方法会得到回调(需要uid)
+            //详细检索一般用于单个地点的搜索，比如搜索一大堆信息后，选择其中一个地点再使用详细检索
+            @Override
+            public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {
+                if (poiDetailResult.error != SearchResult.ERRORNO.NO_ERROR) {
+                    Toast.makeText(getApplication(), "抱歉，未找到结果",
+                            Toast.LENGTH_SHORT).show();
+                } else {// 正常返回结果的时候，此处可以获得很多相关信息
+                    Toast.makeText(getApplication(), poiDetailResult.getName() + ": "
+                                    + poiDetailResult.getAddress(),
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+            //获得POI室内检索结果
+            @Override
+            public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
+            }
+        };
+        poiSearch.setOnGetPoiSearchResultListener(resultListener);
 
-        //检索组件初始化
-        poiSearch = PoiSearch.newInstance();
-        suggestionSearch = SuggestionSearch.newInstance();
-        shareUrlSearch = ShareUrlSearch.newInstance();
-
+        //发起检索
+        PoiCitySearchOption poiCity = new PoiCitySearchOption();
+        poiCity.keyword(str_search).city(city);//这里还能设置显示的个数，默认显示10个
+        poiSearch.searchInCity(poiCity);
     }
+    public class MyOverLay extends PoiOverlay {
+        /**
+         * 构造函数
+         */
+        PoiSearch poiSearch;
+
+        public MyOverLay(BaiduMap baiduMap, PoiSearch poiSearch) {
+            super(baiduMap);
+            this.poiSearch = poiSearch;
+        }
+
+        /**
+         * 覆盖物被点击时
+         */
+        @Override
+        public boolean onPoiClick(int i) {
+            //获取点击的标记物的数据
+            PoiInfo poiInfo = getPoiResult().getAllPoi().get(i);
+            Log.e("TAG", poiInfo.name + "   " + poiInfo.address + "   " + poiInfo.phoneNum);
+            //  发起一个详细检索,要使用uid
+            poiSearch.searchPoiDetail(new PoiDetailSearchOption().poiUid(poiInfo.uid));
+            return true;
+        }
+    }
+
+
+
+    //步行路径规划
+    void walkroute(){
+        RoutePlanSearch routePlanSearch = RoutePlanSearch.newInstance();//路线规划对象
+        //给路线规划添加监听
+        routePlanSearch.setOnGetRoutePlanResultListener(new OnGetRoutePlanResultListener() {
+            //步行路线结果回调
+            @Override
+            public void onGetWalkingRouteResult(WalkingRouteResult walkingRouteResult) {
+                baiduMap.clear();
+                if (walkingRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
+                    WalkingRouteOverlay walkingOverlay = new WalkingRouteOverlay(baiduMap);
+                    walkingOverlay.setData(walkingRouteResult.getRouteLines().get(0));// 设置一条路线方案
+                    walkingOverlay.addToMap();
+                    walkingOverlay.zoomToSpan();
+                    baiduMap.setOnMarkerClickListener(walkingOverlay);
+                    Log.e("TAG", walkingOverlay.getOverlayOptions() + "");
+
+                } else {
+                    Toast.makeText(getBaseContext(), "搜不到！", Toast.LENGTH_SHORT).show();
+                }
+            }
+            //换乘线结果回调
+            @Override
+            public void onGetTransitRouteResult(TransitRouteResult transitRouteResult) {
+
+            }
+            //跨城公共交通路线结果回调
+            @Override
+            public void onGetMassTransitRouteResult(MassTransitRouteResult massTransitRouteResult) {
+
+            }
+            //驾车路线结果回调
+            @Override
+            public void onGetDrivingRouteResult(DrivingRouteResult drivingRouteResult) {
+                baiduMap.clear();//清除图标或路线
+                if (drivingRouteResult == null
+                        || drivingRouteResult.error != SearchResult.ERRORNO.NO_ERROR) {
+                    Toast.makeText(getBaseContext(), "抱歉，未找到结果",
+                            Toast.LENGTH_SHORT).show();
+                }
+                if (drivingRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
+                    DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
+                            baiduMap);
+                    drivingRouteOverlay.setData(drivingRouteResult.getRouteLines().get(1));// 设置一条驾车路线方案
+                    baiduMap.setOnMarkerClickListener(drivingRouteOverlay);
+                    drivingRouteOverlay.addToMap();
+                    drivingRouteOverlay.zoomToSpan();
+                    int totalLine = drivingRouteResult.getRouteLines().size();
+                    Toast.makeText(getBaseContext(),
+                            "共查询出" + totalLine + "条符合条件的线路", Toast.LENGTH_LONG).show();
+
+                    // 通过getTaxiInfo()可以得到很多关于驾车的信息
+                }
+            }
+            //室内路线规划回调
+            @Override
+            public void onGetIndoorRouteResult(IndoorRouteResult indoorRouteResult) {
+
+            }
+            // 骑行路线结果回调
+            @Override
+            public void onGetBikingRouteResult(BikingRouteResult bikingRouteResult) {
+
+            }
+        });
+
+        //定义Maker坐标点,深圳大学经度和纬度113.943062,22.54069
+        //设置的时候经纬度是反的 纬度在前，经度在后
+        LatLng point = new LatLng(22.54069, 113.943062);
+        //获得关键字
+        String key = "西安电子科技大学南校区";
+        //创建步行路线搜索对象
+        WalkingRoutePlanOption walkingSearch = new WalkingRoutePlanOption();
+        //设置节点对象，可以通过城市+关键字或者使用经纬度对象来设置
+        PlanNode fromeNode = PlanNode.withCityNameAndPlaceName(city, key);
+        PlanNode toNode = PlanNode.withLocation(point);
+        walkingSearch.from(fromeNode).to(toNode);
+        routePlanSearch.walkingSearch(walkingSearch);//发起路线检索
+    }
+    //驾驶路径规划
+    void carroute(){
+        RoutePlanSearch routePlanSearch = RoutePlanSearch.newInstance();//路线规划对象
+        //给路线规划添加监听
+        routePlanSearch.setOnGetRoutePlanResultListener(new OnGetRoutePlanResultListener() {
+            //步行路线结果回调
+            @Override
+            public void onGetWalkingRouteResult(WalkingRouteResult walkingRouteResult) {
+                baiduMap.clear();
+                if (walkingRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
+                    WalkingRouteOverlay walkingOverlay = new WalkingRouteOverlay(baiduMap);
+                    walkingOverlay.setData(walkingRouteResult.getRouteLines().get(0));// 设置一条路线方案
+                    walkingOverlay.addToMap();
+                    walkingOverlay.zoomToSpan();
+                    baiduMap.setOnMarkerClickListener(walkingOverlay);
+                    Log.e("TAG", walkingOverlay.getOverlayOptions() + "");
+
+                } else {
+                    Toast.makeText(getBaseContext(), "搜不到！", Toast.LENGTH_SHORT).show();
+                }
+            }
+            //换乘线结果回调
+            @Override
+            public void onGetTransitRouteResult(TransitRouteResult transitRouteResult) {
+
+            }
+            //跨城公共交通路线结果回调
+            @Override
+            public void onGetMassTransitRouteResult(MassTransitRouteResult massTransitRouteResult) {
+
+            }
+            //驾车路线结果回调
+            @Override
+            public void onGetDrivingRouteResult(DrivingRouteResult drivingRouteResult) {
+                baiduMap.clear();//清除图标或路线
+                if (drivingRouteResult == null
+                        || drivingRouteResult.error != SearchResult.ERRORNO.NO_ERROR) {
+                    Toast.makeText(getBaseContext(), "抱歉，未找到结果",
+                            Toast.LENGTH_SHORT).show();
+                }
+                if (drivingRouteResult.error == SearchResult.ERRORNO.NO_ERROR) {
+                    MyDrivingRouteOverlay drivingRouteOverlay = new MyDrivingRouteOverlay(  //使用自定义的overlay
+                            baiduMap);
+                    baiduMap.setOnMarkerClickListener(drivingRouteOverlay);
+                    drivingRouteOverlay.setData(drivingRouteResult.getRouteLines().get(1));// 设置一条驾车路线方案
+                    drivingRouteOverlay.addToMap();
+                    drivingRouteOverlay.zoomToSpan();
+                    int totalLine = drivingRouteResult.getRouteLines().size();
+                    Toast.makeText(getBaseContext(),
+                            "共查询出" + totalLine + "条符合条件的线路", Toast.LENGTH_LONG).show();
+
+                    // 通过getTaxiInfo()可以得到很多关于驾车的信息
+                }
+            }
+            //室内路线规划回调
+            @Override
+            public void onGetIndoorRouteResult(IndoorRouteResult indoorRouteResult) {
+
+            }
+            // 骑行路线结果回调
+            @Override
+            public void onGetBikingRouteResult(BikingRouteResult bikingRouteResult) {
+
+            }
+        });
+
+        //定义Maker坐标点,深圳大学经度和纬度113.943062,22.54069
+        //设置的时候经纬度是反的 纬度在前，经度在后
+        LatLng point = new LatLng(22.54069, 113.943062);
+        //获得关键字
+        String key = "西安电子科技大学南校区";
+        //创建驾车路线搜索对象
+        DrivingRoutePlanOption drivingOptions = new DrivingRoutePlanOption();
+        //设置节点对象，可以通过城市+关键字或者使用经纬度对象来设置
+        PlanNode fromeNode = PlanNode.withCityNameAndPlaceName(city, key);
+        PlanNode toNode = PlanNode.withLocation(point);
+        drivingOptions.from(fromeNode).to(toNode);
+        drivingOptions.policy(DrivingRoutePlanOption.DrivingPolicy.ECAR_AVOID_JAM);//设置驾车策略，避免拥堵
+        routePlanSearch.drivingSearch(drivingOptions);//发起驾车检索
+    }
+    private class MyDrivingRouteOverlay extends DrivingRouteOverlay {
+        public MyDrivingRouteOverlay(BaiduMap baiduMap) {
+            super(baiduMap);
+        }
+        @Override
+        public int getLineColor() {
+            //红色的路径
+            return Color.RED;
+        }
+        @Override
+        public BitmapDescriptor getStartMarker() {
+            //自定义的起点图标
+            return BitmapDescriptorFactory.fromResource(R.drawable.begin);
+        }
+        @Override
+        public BitmapDescriptor getTerminalMarker() {
+            //自定义的终点图标
+            return BitmapDescriptorFactory.fromResource(R.drawable.end);
+        }
+    }
+
     class MyLocationListener implements BDLocationListener {
         @Override
         public void onConnectHotSpotMessage(String s, int i) {
@@ -177,15 +487,12 @@ public class SearchResultActivity extends Activity {
 
             } else if (locType == BDLocation.TypeNetWorkLocation) {
                 addrStr = location.getAddrStr();// 获取反地理编码(文字描述的地址)
-//                Toast.makeText(MainActivity.this, addrStr,
-//                        Toast.LENGTH_SHORT).show();
             }
             direction = location.getDirection();// 获取手机方向，【0~360°】,手机上面正面朝北为0°
             province = location.getProvince();// 省份
             city = location.getCity();// 城市
             district = location.getDistrict();// 区县
 
-            // 构造定位数据
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(radius)//
                     .direction(direction)// 方向
@@ -208,139 +515,6 @@ public class SearchResultActivity extends Activity {
             mVibrator.vibrate(1000);//振动提醒已到设定位置附近
         }
     }
-
-    /**
-     * 自定义poi搜索
-     * @param str
-     */
-
-    private void mypoisearch (String str){
-
-    }
-    OnGetSuggestionResultListener suggestionResultListener = new OnGetSuggestionResultListener() {
-        @Override
-        public void onGetSuggestionResult(SuggestionResult suggestionResult) {
-
-        }
-    };
-    OnGetShareUrlResultListener shareUrlResultListener = new OnGetShareUrlResultListener() {
-        //poi详情分享url
-        @Override
-        public void onGetPoiDetailShareUrlResult(ShareUrlResult arg0) {
-
-            Toast.makeText(SearchResultActivity.this, "详细url分享："+arg0.toString(), Toast.LENGTH_SHORT).show();
-        }
-        //请求位置信息分享url
-        @Override
-        public void onGetLocationShareUrlResult(ShareUrlResult arg0) {
-
-            Toast.makeText(SearchResultActivity.this, "url分享："+arg0.toString(), Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onGetRouteShareUrlResult(ShareUrlResult shareUrlResult) {
-
-        }
-    };
-    OnGetPoiSearchResultListener poiSearchResultListener = new OnGetPoiSearchResultListener() {
-        @Override
-        public void onGetPoiResult(PoiResult poiResult) {
-            if (poiResult == null
-                    || poiResult.error == SearchResult.ERRORNO.RESULT_NOT_FOUND) {
-                Toast.makeText(SearchResultActivity.this, "未找到结果",
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (poiResult.error == SearchResult.ERRORNO.NO_ERROR) {
-                baiduMap.clear();
-                SearchResultActivity.MyPoiOverlay poiOverlay = new SearchResultActivity.MyPoiOverlay(baiduMap);
-                poiOverlay.setData(poiResult);
-                baiduMap.setOnMarkerClickListener(poiOverlay);
-                poiOverlay.addToMap();
-                poiOverlay.zoomToSpan();
-            }
-        }
-
-        @Override
-        public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {
-            if (poiDetailResult.error != SearchResult.ERRORNO.NO_ERROR) {
-                Toast.makeText(SearchResultActivity.this, "抱歉，未找到结果",
-                        Toast.LENGTH_SHORT).show();
-            } else {// 正常返回结果的时候，此处可以获得很多相关信息
-                Toast.makeText(
-                        SearchResultActivity.this,
-                        poiDetailResult.getName() + ": "
-                                + poiDetailResult.getAddress(),
-                        Toast.LENGTH_LONG).show();
-            }
-
-        }
-
-        @Override
-        public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
-
-        }
-    };
-
-    class MyPoiOverlay extends PoiOverlay {
-
-        public MyPoiOverlay(BaiduMap arg0) {
-            super(arg0);
-        }
-
-        // 检索Poi详细信息.获取PoiOverlay
-        @Override
-        public boolean onPoiClick(int arg0) {
-            super.onPoiClick(arg0);
-            PoiInfo poiInfo = getPoiResult().getAllPoi().get(arg0);
-            poiSearch.searchPoiDetail(new PoiDetailSearchOption()
-                    .poiUid(poiInfo.uid));
-            return true;
-        }
-
-    }
-
-    /**
-     * 城市内搜索
-     */
-    private void citySearch() {
-        // 设置检索参数
-        PoiCitySearchOption citySearchOption = new PoiCitySearchOption();
-        citySearchOption.city(city);// 城市
-        citySearchOption.keyword(str_search);// 关键字
-        citySearchOption.pageCapacity(15);// 默认每页10条
-//        citySearchOption.pageNum(page);// 分页编号
-        // 发起检索请求
-        poiSearch.searchInCity(citySearchOption);
-    }
-
-    /**
-     * 范围检索
-     */
-    private void boundSearch(int page) {
-        PoiBoundSearchOption boundSearchOption = new PoiBoundSearchOption();
-        LatLng southwest = new LatLng(latitude - 0.01, longitude - 0.012);// 西南
-        LatLng northeast = new LatLng(latitude + 0.01, longitude + 0.012);// 东北
-        LatLngBounds bounds = new LatLngBounds.Builder().include(southwest)
-                .include(northeast).build();// 得到一个地理范围对象
-        boundSearchOption.bound(bounds);// 设置poi检索范围
-        boundSearchOption.keyword(str_search);// 检索关键字
-        boundSearchOption.pageNum(page);
-        poiSearch.searchInBound(boundSearchOption);// 发起poi范围检索请求
-    }
-
-    /**
-     * 附近检索
-     */
-    private void nearbySearch(int page) {
-        PoiNearbySearchOption nearbySearchOption = new PoiNearbySearchOption();
-        nearbySearchOption.location(new LatLng(latitude, longitude));
-        nearbySearchOption.keyword(str_search);
-        nearbySearchOption.radius(1000);// 检索半径，单位是米
-        nearbySearchOption.pageNum(page);
-        poiSearch.searchNearby(nearbySearchOption);// 发起附近检索请求
-    }
-
 
     @Override
     protected void onResume() {

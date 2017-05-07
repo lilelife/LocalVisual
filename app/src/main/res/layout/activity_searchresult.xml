@@ -10,16 +10,23 @@
         <TextView
             android:id="@+id/tv_resulttext"
             android:layout_width="400px"
-            android:layout_height="50px"
+            android:layout_height="60px"
             android:layout_marginLeft="70dp"
             android:layout_marginTop="10dp"
             android:text="@string/str_text1"
             android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/iv_back2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/back"
+            android:layout_alignTop="@+id/tv_resulttext">
+        </ImageView>
 
         <Button
             android:id="@+id/btn_refresh"
             android:layout_marginLeft="300dp"
-            android:background="#e000000"
+            android:background="#00ffffff"
             android:layout_width="70dp"
             android:layout_height="40dp"
             android:text="刷新"></Button>
