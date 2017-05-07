@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,11 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.example.lile.localvisual.bean.Users;
+
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
 
 public class MainActivity extends Activity {
     private MapView mapView;
@@ -42,7 +48,6 @@ public class MainActivity extends Activity {
     private String city;// 城市信息
     private String district;// 区县信息
     private float direction;// 手机方向信息
-
     private int locType;
 
     // 定位按钮
@@ -54,9 +59,10 @@ public class MainActivity extends Activity {
     private BitmapDescriptor currentMarker = null;
     // 记录是否第一次定位
     private boolean isFirstLoc = true;
-
     //振动器设备
     private Vibrator mVibrator;
+
+    private Users user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +135,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        user = new Users();
 
         }
     class MyLocationListener implements BDLocationListener {
@@ -177,7 +184,12 @@ public class MainActivity extends Activity {
             // 设置定位数据
             bdMap.setMyLocationData(locData);
             LatLng ll = new LatLng(latitude, longitude);
+
+            //TODO 添加数据
             MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(ll);
+
+
+
             bdMap.animateMapStatus(msu);
 
         }

@@ -4,4 +4,5 @@
     <string name="str_refresh">点击刷新</string>
     <string name="str_search">搜索地理位置等</string>
     <string name="str_text1">搜索结果如下：</string>
+    <string name="title_activity_sign">SignActivity</string>
 </resources>
