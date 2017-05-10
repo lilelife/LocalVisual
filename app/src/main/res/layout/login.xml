@@ -2,31 +2,77 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <view
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        ></view>
-    <EditText
-        android:id="@+id/et_loginname"
-        android:layout_width="300dp"
-        android:layout_height="45dp"
-        android:layout_marginLeft="50dp"
-        android:textSize="40px"
-        android:layout_marginTop="10dp"
-        android:textColor="@android:color/black"
-        android:gravity="start|center_vertical"
-        android:hint=" 请输入邮箱"
-        />
-    <EditText
-        android:id="@+id/et_loginpassword"
-        android:layout_width="300dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="50dp"
-        android:textSize="40px"
-        android:gravity="start|center_vertical"
-        android:hint="请输入密码"
-        />
+        android:layout_height="120dp"
+        >
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="300dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="40dp"
+            android:textStyle="bold"
+            android:text="LocalVisual Login "
+            android:textColor="#3399ff"
+            android:textSize="30dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="45dp"
+            android:textColor="#3091f2"
+            android:text="邮箱："
+            android:layout_marginLeft="30dp"
+            android:textSize="15dp"
+            android:textStyle="italic"
+            />
+        <EditText
+            android:id="@+id/et_loginname"
+            android:layout_width="250dp"
+            android:layout_height="45dp"
+            android:layout_marginLeft="3dp"
+            android:textSize="40px"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext1"
+            android:textColor="@android:color/black"
+            android:gravity="start|center_vertical"
+            android:hint=" 请输入邮箱"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="45dp"
+            android:text="密码："
+            android:textColor="#3091f2"
+            android:layout_marginLeft="30dp"
+            android:textSize="15dp"
+            android:textStyle="italic"
+            />
+        <EditText
+            android:id="@+id/et_loginpassword"
+            android:layout_width="250dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="3dp"
+            android:textSize="40px"
+            android:inputType="textPassword"
+            android:gravity="start|center_vertical"
+            android:background="@drawable/edittext1"
+            android:hint="请输入密码"
+            />
+    </LinearLayout>
     <Button
         android:id="@+id/btn_login"
         android:layout_width="300dp"
@@ -35,15 +81,17 @@
         android:gravity="start|center_vertical"
         android:layout_marginLeft="50dp"
         android:textSize="40px"
-        android:background="#F6F6F6"
-        android:hint="       登                                录"
+        android:background="@drawable/btn"
+        android:paddingLeft="50dp"
+        android:hint=" 登                                 录"
         />
 
-    <TextView
+    <Button
         android:id="@+id/tv_tosign"
         android:layout_width="200dp"
         android:layout_height="50dp"
         android:textSize="40px"
+        android:background="@android:color/transparent"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="90dp"
         android:text="没有密码？注册一个"

@@ -60,13 +60,11 @@
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote" />
-
         <activity
             android:name=".Login"
-            android:theme="@android:style/Theme.Black.NoTitleBar">
+            android:theme="@android:style/Theme.Light.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -87,6 +85,7 @@
             android:name=".Sign"
             android:label="注册"
             android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
+
         <activity
             android:name=".MainActivity"
             android:label="主界面"

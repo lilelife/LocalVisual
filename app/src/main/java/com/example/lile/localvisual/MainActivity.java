@@ -19,18 +19,18 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
-import com.example.lile.localvisual.bean.Users;
+import com.example.lile.localvisual.bean._User;
 
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class MainActivity extends Activity {
     private MapView mapView;
@@ -62,12 +62,13 @@ public class MainActivity extends Activity {
     //振动器设备
     private Vibrator mVibrator;
 
-    private Users user;
+    private _User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
+        Bmob.initialize(this, "cedd190c558644d012167c477e2a68c9"); // 后端云
        // mapView = (MapView) findViewById(R.id.baidumap);
         init();
     }
@@ -134,9 +135,9 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
-
-        user = new Users();
-
+        user = BmobUser.getCurrentUser(_User.class);// bmobuser初始化 得到当前登陆user
+        String username = (String) BmobUser.getObjectByKey("username");
+        Log.i("Main进程","当前登录用户"+username);
         }
     class MyLocationListener implements BDLocationListener {
         @Override
@@ -184,11 +185,10 @@ public class MainActivity extends Activity {
             // 设置定位数据
             bdMap.setMyLocationData(locData);
             LatLng ll = new LatLng(latitude, longitude);
-
+            //添加位置信息
+            sendlocToBmob(ll);
             //TODO 添加数据
             MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(ll);
-
-
 
             bdMap.animateMapStatus(msu);
 
@@ -209,6 +209,22 @@ public class MainActivity extends Activity {
         }
     }
 
+    //发送位置数据到bmob
+    private void sendlocToBmob(LatLng latLng){
+        user.setLatitude(latLng.latitude);
+        user.setLongtitude(latLng.longitude);
+        user.update(new UpdateListener() {
+            @Override
+            public void done(BmobException e) {
+                if(e == null){
+                    Log.i("sendLoctoBmob","更新成功");
+                }else {
+                    Log.i("sendLoctoBmob","跟新失败");
+                }
+            }
+        });
+        Log.i("sendloctoBmob","-->数据为"+latLng.toString());
+    }
 
     @Override
     protected void onResume() {
