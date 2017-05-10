@@ -51,8 +51,9 @@
 
            <Button
                android:id="@+id/btn_deletetext"
-               android:layout_width="40dp"
-               android:layout_height="40dp"
+               android:layout_marginTop="15dp"
+               android:layout_width="30dp"
+               android:layout_height="30dp"
                android:visibility="gone"
                android:background="@drawable/delete"
                android:layout_alignBaseline="@+id/et_search"

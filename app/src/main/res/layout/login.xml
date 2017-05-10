@@ -94,6 +94,6 @@
         android:background="@android:color/transparent"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="90dp"
-        android:text="没有密码？注册一个"
+        android:text="没有账号？注册一个"
         />
 </LinearLayout>

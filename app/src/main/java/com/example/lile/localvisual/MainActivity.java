@@ -61,7 +61,6 @@ public class MainActivity extends Activity {
     private boolean isFirstLoc = true;
     //振动器设备
     private Vibrator mVibrator;
-
     private _User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
