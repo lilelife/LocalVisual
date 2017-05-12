@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -24,6 +25,7 @@ public class LunchActivity extends Activity {
             PackageInfo pi = pm.getPackageInfo("org.wordpress.android", 0);
             TextView versionNumber = (TextView) findViewById(R.id.tv_version);
             versionNumber.setText("Version " + pi.versionName);
+            Log.i("LunchActivity",versionNumber.getText().toString());
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

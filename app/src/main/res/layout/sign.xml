@@ -112,4 +112,16 @@
         android:paddingLeft="50dp"
         android:hint="注                                     册"
         />
+    <Button
+        android:id="@+id/btn_backtologin"
+        android:layout_width="300dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="20dp"
+        android:gravity="start|center_vertical"
+        android:layout_marginLeft="50dp"
+        android:textSize="40px"
+        android:background="@android:color/transparent"
+        android:paddingLeft="50dp"
+        android:text="  返回登录界面"
+        />
 </LinearLayout>

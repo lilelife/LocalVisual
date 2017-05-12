@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lile.localvisual.bean._User;
 
@@ -25,6 +26,7 @@ public class Sign extends Activity {
     private EditText et_password;
     private TextView et_password2;
     private Button btn_sign;
+    private Button btn_backTologin;
     private BmobUser user;
     @Override
     protected void onCreate( Bundle savedInstanceState) {
@@ -45,21 +47,35 @@ public class Sign extends Activity {
                 user = new _User();
                 user.setPassword(et_password.getText().toString()); // et_name.getText().toString()
                 user.setUsername(et_name.getText().toString());
-                Log.i("注册Activity2","-->"+et_password.getText().toString()+"-"+et_name.getText().toString().trim());
-                user.signUp(new SaveListener<_User>() {
-                    @Override
-                    public void done(_User users, BmobException e) {
-                        if(e==null){
-                            Log.i("注册","注册成功:");
-                            Intent intent = new Intent(Sign.this,MainActivity.class);
-                            startActivity(intent);
-                        }else{
-                            Log.i("注册","注册失败:" );// +users.toString()
-
+                if(user.getUsername().toString().equals("")||
+                        et_password.getText().toString().equals("")
+                        ||et_password2.getText().toString().equals("")){
+                    Toast.makeText(getApplicationContext(),"邮箱或密码不能为空！",Toast.LENGTH_SHORT).show();
+                }else{
+                    Log.i("注册Activity2","-->"+et_password.getText().toString()+"-"+et_name.getText().toString().trim());
+                    user.signUp(new SaveListener<_User>() {
+                        @Override
+                        public void done(_User users, BmobException e) {
+                            if(e==null){
+                                Log.i("注册","注册成功:");
+                                Toast.makeText(Sign.this,"恭喜您注册成功",Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(Sign.this,MainActivity.class);
+                                startActivity(intent);
+                            }else{
+                                Log.i("注册","注册失败:" );// +users.toString()
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
+
+            }
+        });
+        btn_backTologin =(Button) findViewById(R.id.btn_backtologin);
+        btn_backTologin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
     }
