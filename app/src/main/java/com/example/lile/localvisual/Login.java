@@ -61,7 +61,10 @@ public class Login extends Activity {
                                 //通过BmobUser user = BmobUser.getCurrentUser()获取登录成功后的本地用户信息
                                 //如果是自定义用户对象MyUser，可通过MyUser user = BmobUser.getCurrentUser(MyUser.class)获取自定义用户信息
                                 Intent intent = new Intent(Login.this,MainActivity.class);
+                                Log.i("Login",et_name.getText().toString());
+                                intent.putExtra("user",et_name.getText().toString());
                                 startActivity(intent);
+                                Login.this.finish();
                             }else{
                                 Log.i("登录Activity","登 录失败"+et_name.getText());
                                 Toast.makeText(Login.this,"用户名或者密码错误",Toast.LENGTH_SHORT).show();
@@ -69,6 +72,7 @@ public class Login extends Activity {
                         }
                     });
                 }
+
             }
         });
         tv_sign = (Button) findViewById(R.id.tv_tosign);
@@ -77,6 +81,7 @@ public class Login extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(Login.this,Sign.class);
                 startActivity(intent);
+
             }
         });
     }

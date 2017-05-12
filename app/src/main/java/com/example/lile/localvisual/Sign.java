@@ -61,6 +61,7 @@ public class Sign extends Activity {
                                 Toast.makeText(Sign.this,"恭喜您注册成功",Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(Sign.this,MainActivity.class);
                                 startActivity(intent);
+                                Sign.this.finish();
                             }else{
                                 Log.i("注册","注册失败:" );// +users.toString()
                             }

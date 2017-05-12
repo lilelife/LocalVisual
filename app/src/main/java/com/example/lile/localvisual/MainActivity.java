@@ -3,12 +3,18 @@ package com.example.lile.localvisual;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -19,6 +25,7 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -49,6 +56,8 @@ public class MainActivity extends Activity {
     private String district;// 区县信息
     private float direction;// 手机方向信息
     private int locType;
+    private Intent intent;
+    private String myUser;
 
     // 定位按钮
     private Button locateBtn;
@@ -62,11 +71,20 @@ public class MainActivity extends Activity {
     //振动器设备
     private Vibrator mVibrator;
     private _User user;
+
+    //侧滑向
+    private DrawerLayout drawerLayout;
+    private Button btn_returnAll;
+    private TextView tv_myUser;
+
+    private  MyOrientationListener myOrientationListener;
+    private  float mLastX;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("MainActivity","oncreate");
         super.onCreate(savedInstanceState);
         SDKInitializer.initialize(getApplicationContext());
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.mydrawerlayout);
         Bmob.initialize(this, "cedd190c558644d012167c477e2a68c9"); // 后端云
        // mapView = (MapView) findViewById(R.id.baidumap);
         init();
@@ -97,13 +115,18 @@ public class MainActivity extends Activity {
         }
     };
     void init() {
+        intent = getIntent();
+        myUser = intent.getStringExtra("user");
+        Log.i("MainActivity","获取到信息"+myUser);
         //百度地图
         mapView = (MapView) findViewById(R.id.baidumap);
         bdMap = mapView.getMap();
         bdMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
         locateBtn = (Button) findViewById(R.id.btn_location);
         locateBtn.setOnClickListener(listener);
-        currentMode = MyLocationConfiguration.LocationMode.COMPASS;
+        //TODO 定位模式
+        currentMarker = BitmapDescriptorFactory.fromResource(R.drawable.dingwei);
+        currentMode = MyLocationConfiguration.LocationMode.NORMAL;
         bdMap.setMyLocationConfigeration(new MyLocationConfiguration(
                 currentMode, true, currentMarker));
         mVibrator =(Vibrator)getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE );
@@ -137,7 +160,35 @@ public class MainActivity extends Activity {
         user = BmobUser.getCurrentUser(_User.class);// bmobuser初始化 得到当前登陆user
         String username = (String) BmobUser.getObjectByKey("username");
         Log.i("Main进程","当前登录用户"+username);
-        }
+
+        //实现侧滑
+        drawerLayout = (DrawerLayout) findViewById(R.id.dlMenu);
+        btn_returnAll = (Button)findViewById(R.id.btn_returnAll);
+        btn_returnAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("MainActivity","实现退出当前登录/bug");
+            }
+        });
+        tv_myUser = (TextView) findViewById(R.id.tv_myuser);
+        tv_myUser.setText("当前用户--》"+myUser);
+
+        initSenson();
+    }
+
+    //传感器方法
+    void initSenson(){
+        Log.i("MainActivity","传感器使用");
+        myOrientationListener = new MyOrientationListener(this);
+        myOrientationListener.setOnOrientationListener(new MyOrientationListener.OnOrientationListener() {
+            @Override
+            public void onOrientationChanged(float x) {
+                //将获取的x轴方向赋值给全局变量
+                mLastX = x;
+                Log.i("MainActivity","传感器"+mLastX);
+            }
+        });
+    }
     class MyLocationListener implements BDLocationListener {
         @Override
         public void onConnectHotSpotMessage(String s, int i) {
@@ -177,7 +228,7 @@ public class MainActivity extends Activity {
             // 构造定位数据
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(radius)//
-                    .direction(direction)// 方向
+                    .direction(mLastX)// 方向 通过传感器的到的
                     .latitude(latitude)//
                     .longitude(longitude)//
                     .build();
@@ -224,6 +275,8 @@ public class MainActivity extends Activity {
         });
         Log.i("sendloctoBmob","-->数据为"+latLng.toString());
     }
+
+
 
     @Override
     protected void onResume() {
