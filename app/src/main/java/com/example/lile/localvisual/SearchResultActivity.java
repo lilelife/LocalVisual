@@ -32,6 +32,7 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.Text;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.overlayutil.DrivingRouteOverlay;
@@ -70,6 +71,10 @@ import com.baidu.mapapi.search.share.ShareUrlSearch;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
+import com.example.lile.localvisual.bean._User;
+
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobUser;
 
 /**
  * Created by lile on 2017/4/23.
@@ -106,19 +111,31 @@ public class SearchResultActivity extends Activity {
     private Vibrator mVibrator; //震动
     private String str_search;
     private Intent intent;
-
+    //传感器
+    private  MyOrientationListener myOrientationListener;
+    private  float mLastX;
     //检索信息
     private PoiSearch poiSearch;
     private SuggestionSearch suggestionSearch;
     private ShareUrlSearch shareUrlSearch;
-    private LatLng myLatLng;
+    private LatLng myLatLng;// 目的点
+    private LatLng fromlatLng;
     private static final String TAG="SearchResultActivit";
+    private String  address;
+
+    private Button btn_returnAll;
+    private TextView tv_user;
+    private TextView tv_locinfo;
+    private TextView tv_to;//地图上点击的地方
+
+    private _User user;//当前用户
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("SearchResultActivit","Oncreate开始");
         super.onCreate(savedInstanceState);
         SDKInitializer.initialize(getApplicationContext());
-        setContentView(R.layout.activity_searchresult);
+        setContentView(R.layout.mydrawerlayout2);
+        Bmob.initialize(this, "cedd190c558644d012167c477e2a68c9"); // 后端云
         Log.i("SearchResultActivit","地图initalize");
         init();
 //        citySearch();
@@ -127,7 +144,20 @@ public class SearchResultActivity extends Activity {
 
     void init(){
         initview();
-        Log.i("SearchResultActivit","viw初始化");
+//        Log.i("SearchResultActivit","viw初始化");
+        //侧滑
+        tv_user = (TextView) findViewById(R.id.tv_myuser2);
+        btn_returnAll= (Button) findViewById(R.id.btn_returnAll2);
+        user = BmobUser.getCurrentUser(_User.class);
+        tv_user.setText("当前用户为：-》"+user.getUsername());
+        btn_returnAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SearchResultActivity.this,Login.class);
+                startActivity(intent);
+                SearchResultActivity.this.finish();
+            }
+        });
         tv_resutltext.setText(str_search+"的搜索结果是：");
         btn_refreshresult.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,7 +196,7 @@ public class SearchResultActivity extends Activity {
                     @Override
                     public void onGetReverseGeoCodeResult(ReverseGeoCodeResult arg0) {
                         //获取点击的坐标地址
-                        String address = arg0.getAddress();
+                       address = arg0.getAddress();
                         System.out.println("address="+address);
                     }
 
@@ -176,6 +206,8 @@ public class SearchResultActivity extends Activity {
                 });
 
                 btn_go.setVisibility(View.VISIBLE);
+                tv_to.setVisibility(View.VISIBLE);
+                tv_to.setText("该点位置是；"+address);
             }
             @Override
             public boolean onMapPoiClick(MapPoi mapPoi) {
@@ -192,7 +224,21 @@ public class SearchResultActivity extends Activity {
             }
         });
         poi();
-        //路径检索
+        initSenson();
+    }
+    //传感器方法
+    void initSenson(){
+        Log.i("MainActivity","传感器使用");
+        myOrientationListener = new MyOrientationListener(this);
+        myOrientationListener.setOnOrientationListener(new MyOrientationListener.OnOrientationListener() {
+            @Override
+            public void onOrientationChanged(float x) {
+                //将获取的x轴方向赋值给全局变量
+                mLastX = x;
+                Log.i("MainActivity","传感器"+mLastX);
+            }
+        });
+        myOrientationListener.start();
     }
 
     void initview(){
@@ -200,8 +246,15 @@ public class SearchResultActivity extends Activity {
         mapView = (MapView) findViewById(R.id.baidu_map2);
         baiduMap = mapView.getMap();
         baiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(19));
+        tv_locinfo = (TextView) findViewById(R.id.tv_locinfo2);
+        tv_to = (TextView) findViewById(R.id.tv_to2);
+        tv_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tv_to.setVisibility(View.GONE);
+            }
+        });
         loc();
-
         locateBtn = (Button) findViewById(R.id.btn_location2);
         locateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -220,6 +273,7 @@ public class SearchResultActivity extends Activity {
                 Log.i(TAG,"设置不可见");
                 btn_switch.setVisibility(View.VISIBLE);
                 btn_go.setVisibility(View.GONE);
+                tv_to.setVisibility(View.GONE);
             }
         });
         btn_switch = (Button)findViewById(R.id.btn_switch);
@@ -248,6 +302,8 @@ public class SearchResultActivity extends Activity {
         poiSearch = PoiSearch.newInstance();
         suggestionSearch = SuggestionSearch.newInstance();
         shareUrlSearch = ShareUrlSearch.newInstance();
+
+
     }
     //定位
     void loc(){
@@ -359,8 +415,6 @@ public class SearchResultActivity extends Activity {
         }
     }
 
-
-
     //步行路径规划
     void walkroute(LatLng latLng){
         RoutePlanSearch routePlanSearch = RoutePlanSearch.newInstance();//路线规划对象
@@ -435,9 +489,10 @@ public class SearchResultActivity extends Activity {
         //创建步行路线搜索对象
         WalkingRoutePlanOption walkingSearch = new WalkingRoutePlanOption();
         //设置节点对象，可以通过城市+关键字或者使用经纬度对象来设置
-        PlanNode fromeNode = PlanNode.withCityNameAndPlaceName(city, key);
+//        PlanNode fromeNode = PlanNode.withCityNameAndPlaceName(city, key);
+        PlanNode fromNode = PlanNode.withLocation(fromlatLng);
         PlanNode toNode = PlanNode.withLocation(latLng);
-        walkingSearch.from(fromeNode).to(toNode);
+        walkingSearch.from(fromNode).to(toNode);
         routePlanSearch.walkingSearch(walkingSearch);//发起路线检索
     }
     //驾驶路径规划
@@ -484,7 +539,7 @@ public class SearchResultActivity extends Activity {
                     MyDrivingRouteOverlay drivingRouteOverlay = new MyDrivingRouteOverlay(  //使用自定义的overlay
                             baiduMap);
                     baiduMap.setOnMarkerClickListener(drivingRouteOverlay);
-                    drivingRouteOverlay.setData(drivingRouteResult.getRouteLines().get(1));// 设置一条驾车路线方案
+                    drivingRouteOverlay.setData(drivingRouteResult.getRouteLines().get(0));// 设置一条驾车路线方案
                     drivingRouteOverlay.addToMap();
                     drivingRouteOverlay.zoomToSpan();
                     int totalLine = drivingRouteResult.getRouteLines().size();
@@ -569,17 +624,18 @@ public class SearchResultActivity extends Activity {
             city = location.getCity();// 城市
 //            Log.i("SearchResultActivit","city-->"+city);
             district = location.getDistrict();// 区县
-
+            tv_locinfo.setText("您当前所在的城市是："+province+"省"+city+"市"+district+"区"
+                    +location.getStreet()+"街道");
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(radius)//
-                    .direction(direction)// 方向
+                    .direction(mLastX)// 方向
                     .latitude(latitude)//
                     .longitude(longitude)//
                     .build();
             // 设置定位数据
             baiduMap.setMyLocationData(locData);
-            LatLng ll = new LatLng(latitude, longitude);
-            MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(ll);
+            fromlatLng = new LatLng(latitude, longitude);
+            MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(fromlatLng);
             baiduMap.animateMapStatus(msu);
 
         }
