@@ -16,6 +16,7 @@ import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by lile on 2017/5/7.
@@ -47,12 +48,27 @@ public class Sign extends Activity {
                 user = new _User();
                 user.setPassword(et_password.getText().toString()); // et_name.getText().toString()
                 user.setUsername(et_name.getText().toString());
+                user.setEmail(et_name.getText().toString());
                 if(user.getUsername().toString().equals("")||
                         et_password.getText().toString().equals("")
                         ||et_password2.getText().toString().equals("")){
                     Toast.makeText(getApplicationContext(),"邮箱或密码不能为空！",Toast.LENGTH_SHORT).show();
                 }else{
                     Log.i("注册Activity2","-->"+et_password.getText().toString()+"-"+et_name.getText().toString().trim());
+                    //邮箱注册
+                    final String email = user.getUsername().toString();
+                    BmobUser.requestEmailVerify(email, new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            Log.i("注册Activity2","-->"+"使用邮箱验证");
+
+                            if(e==null){
+                                Toast.makeText(getApplicationContext(),"请求验证邮件成功，请到" + email + "邮箱中进行激活。",Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(getApplicationContext(),"失败:" + e.getMessage(),Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                     user.signUp(new SaveListener<_User>() {
                         @Override
                         public void done(_User users, BmobException e) {

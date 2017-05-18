@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -127,7 +129,7 @@ public class SearchResultActivity extends Activity {
     private TextView tv_user;
     private TextView tv_locinfo;
     private TextView tv_to;//地图上点击的地方
-
+    private RelativeLayout main_reala2;
     private _User user;//当前用户
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,7 +180,7 @@ public class SearchResultActivity extends Activity {
                 myLatLng = latLng;
                 baiduMap.clear();
                 BitmapDescriptor bitmap = BitmapDescriptorFactory
-                        .fromResource(R.drawable.icon_marka);
+                        .fromResource(R.drawable.lle);
                 //构建MarkerOption，用于在地图上添加Marker
                 OverlayOptions option = new MarkerOptions()
                         .position(latLng)
@@ -204,16 +206,15 @@ public class SearchResultActivity extends Activity {
                     public void onGetGeoCodeResult(GeoCodeResult arg0) {
                     }
                 });
+                main_reala2.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1500));
 
-                btn_go.setVisibility(View.VISIBLE);
-                tv_to.setVisibility(View.VISIBLE);
                 tv_to.setText("该点位置是；"+address);
             }
             @Override
             public boolean onMapPoiClick(MapPoi mapPoi) {
                 baiduMap.clear();
                 BitmapDescriptor bitmap = BitmapDescriptorFactory
-                        .fromResource(R.drawable.icon_marka);
+                        .fromResource(R.drawable.lle);
                 //构建MarkerOption，用于在地图上添加Marker
                 OverlayOptions option = new MarkerOptions()
                         .position(mapPoi.getPosition())
@@ -254,6 +255,7 @@ public class SearchResultActivity extends Activity {
                 tv_to.setVisibility(View.GONE);
             }
         });
+        main_reala2 = (RelativeLayout) findViewById(R.id.main_reala2);
         loc();
         locateBtn = (Button) findViewById(R.id.btn_location2);
         locateBtn.setOnClickListener(new View.OnClickListener() {
@@ -272,8 +274,7 @@ public class SearchResultActivity extends Activity {
                 walkroute(myLatLng);
                 Log.i(TAG,"设置不可见");
                 btn_switch.setVisibility(View.VISIBLE);
-                btn_go.setVisibility(View.GONE);
-                tv_to.setVisibility(View.GONE);
+                main_reala2.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             }
         });
         btn_switch = (Button)findViewById(R.id.btn_switch);

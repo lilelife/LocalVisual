@@ -14,7 +14,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -111,6 +114,7 @@ public class MainActivity extends Activity {
     private String AddrStr;
     private  MyOrientationListener myOrientationListener;
     private  float mLastX;
+    private RelativeLayout main_reala;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("MainActivity","oncreate");
@@ -131,6 +135,12 @@ public class MainActivity extends Activity {
         bdMap = mapView.getMap();
         bdMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
         locateBtn = (Button) findViewById(R.id.btn_location);
+
+        Log.i("MainActivity","设置layout获取钱 ");
+
+        main_reala = (RelativeLayout) findViewById(R.id.main_reala);
+        Log.i("MainActivity","设置layout获取");
+
         locateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,7 +151,9 @@ public class MainActivity extends Activity {
         tv_to.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tv_to.setVisibility(View.GONE);
+                Log.i("MainActivity","设置layout大小");
+//                tv_to.setVisibility(View.GONE);
+//                main_reala.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
             }
         });
         tv_locinfo =(TextView) findViewById(R.id.tv_locinfo);
@@ -201,7 +213,7 @@ public class MainActivity extends Activity {
             @Override
             public void onMapClick(LatLng latLng) {
                 BitmapDescriptor bitmap = BitmapDescriptorFactory
-                        .fromResource(R.drawable.icon_marka);
+                        .fromResource(R.drawable.lle);
                 //构建MarkerOption，用于在地图上添加Marker
                 OverlayOptions option = new MarkerOptions()
                         .position(latLng)
@@ -228,9 +240,10 @@ public class MainActivity extends Activity {
                     public void onGetGeoCodeResult(GeoCodeResult arg0) {
                     }
                 });
-                btn_go.setVisibility(View.VISIBLE);
+                main_reala.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1600));
+//                btn_go.setVisibility(View.VISIBLE);
                 latlngto = latLng;
-                tv_to.setVisibility(View.VISIBLE);
+//                tv_to.setVisibility(View.VISIBLE);
                 tv_to.setText("该点的位置信息为："+addrStr);
             }
 
@@ -238,7 +251,7 @@ public class MainActivity extends Activity {
             public boolean onMapPoiClick(MapPoi mapPoi) {
                 bdMap.clear();
                 BitmapDescriptor bitmap = BitmapDescriptorFactory
-                        .fromResource(R.drawable.icon_marka);
+                        .fromResource(R.drawable.lle);
                 //构建MarkerOption，用于在地图上添加Marker
                 OverlayOptions option = new MarkerOptions()
                         .position(mapPoi.getPosition())
@@ -255,8 +268,9 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 walkroute(latlngto);
                 btn_switch.setVisibility(View.VISIBLE);
-                btn_go.setVisibility(View.GONE);
-                tv_to.setVisibility(View.GONE);
+//                btn_go.setVisibility(View.GONE);
+//                tv_to.setVisibility(View.GONE);
+                main_reala.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
             }
         });
         btn_switch.setOnClickListener(new View.OnClickListener() {
